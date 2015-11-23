@@ -1,0 +1,46 @@
+from datetime import *
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+import calendar
+
+
+def kuva():
+    tekst = '\n' + calendar.TextCalendar().formatmonth(int(aasta.get()), int(kuu.get()))
+    vaade = Text(raam, font="Helvetica 30", height="10", width="20", borderwidth="3")
+    vaade.insert(INSERT, tekst)
+    vaade.place(x=270, y=5)
+
+# loome akna
+raam = Tk()
+raam.title("Kalender")
+raam.geometry("900x500")
+
+
+# loome tekstikasti jaoks sildi
+silt = ttk.Label(raam, text="Aasta")
+silt.place(x=5, y=5)
+
+# loome tekstikasti
+aasta = ttk.Entry(raam)
+aasta.place(x=70, y=5, width=150)
+
+# loome tekstikasti jaoks sildi
+silt = ttk.Label(raam, text="Kuu")
+silt.place(x=5, y=30)
+
+# loome tekstikasti
+kuu = ttk.Entry(raam)
+kuu.place(x=70, y=30, width=150)
+
+# loome nupu
+nupp = ttk.Button(raam, text="Näita kalendrit", command=kuva)
+nupp.place(x=70, y=65, width=150)
+
+# ilmutame akna ekraanile
+raam.mainloop()
+
+
+
+
+
