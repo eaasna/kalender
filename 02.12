@@ -1,0 +1,185 @@
+from datetime import *
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+import calendar
+import todo
+
+#lisamuutujad võimaldamaks kuude vahel kerimist
+kuu_lisa = 0
+aasta_lisa = 0
+l = 0
+
+#meetod uue todo lisamiseks
+def uus_todo():
+    global todo_loendur, l
+    f = open('todo.txt', mode="a")
+    w = ttk.Checkbutton(raam, text=todo.get(), command=kustuta_todo())
+    w.place(x=20, y=120+20*(todo_loendur+l), width=150)
+    todo_loendur += 1
+    f.write(todo.get()+"\n")
+    f.close()
+
+def eelmised_todo():
+    global l
+    f = open('todo.txt')
+    eelmised = f.readlines()
+    for i in eelmised:
+        w = ttk.Checkbutton(raam, text=i[:len(i)-1], command=kustuta_todo())
+        w.place(x=20, y=120+20*l, width=150)
+        l += 1
+
+def kustuta_todo():
+    
+        
+    
+#selles osas leitakse praegune aasta/kuu, et anda Entry widgetile see vaikeväärtuseks
+t = date.today().timetuple()
+loendur = 0
+for i in t:
+    if loendur == 0:
+        praegune_aasta = i
+    if loendur == 1:
+        praegune_kuu = i
+    loendur += 1
+    
+
+#meetod soovitud kuu kuvamiseks
+def kuva():
+    global kuu_lisa, aasta_lisa, aasta, kuu
+    if int(kuu.get())+kuu_lisa>12:
+        aasta_lisa += 1
+        kuu_lisa -= 12
+    elif int(kuu.get())+kuu_lisa<1:
+        aasta_lisa -= 1
+        kuu_lisa += 12
+#luuakse eraldi nupud kõigile päevadele
+    a = calendar.Calendar().monthdayscalendar(int(aasta.get())+aasta_lisa, int(kuu.get())+kuu_lisa)
+    if len(a)==4:
+        a = [[0, 0, 0, 0, 0, 0, 0]] + a
+    if len(a)==5:
+        a = a + [[0, 0, 0, 0, 0, 0, 0]]
+    loendur = 1
+    ykor = 130
+    xkor = 290
+    for i in a:
+        for j in i:
+            if not(j==0):
+                nupp = ttk.Button(raam, text=str(j), command=päevavaade)
+                nupp.place(x=xkor, y=ykor, width=60, height=60)
+            else:
+                tahvel = Canvas(raam)
+                tahvel.place(x=xkor, y=ykor, width=60, height=60)
+            if loendur%7==0:
+                ykor += 60
+                xkor = 230
+            loendur += 1
+            xkor += 60
+    kuu_nimed = ["Jaanuar", "Veebruar", "Märts", "Aprill", "Mai", "Juuni", "Juuli", "August", "September", "Oktoober", "November", "Detsember"]
+    # loome sildi kuu nimetuse ja aastaga
+    silt = ttk.Label(raam, text=kuu_nimed[int(kuu.get())-1+kuu_lisa]+' '+str(int(aasta.get())+aasta_lisa), font="Helvetica 30")
+    silt.place(x=290, y=20, width=400)
+
+
+#meetodid järgmine() ja eelmine() vastavad "Järgmine kuu" ja "Eelmine kuu" nuppudele
+def järgmine():
+    global kuu_lisa
+    kuu_lisa += 1
+    kuva()
+
+def eelmine():
+    global kuu_lisa
+    kuu_lisa -= 1
+    kuva()
+
+
+
+
+
+
+#meetod uue ürituse salvestamiseks faili
+def salvesta():
+    global üritus
+
+#meetod päevavaate kuvamiseks
+def päevavaade():
+    n=0
+    for i in range(7, 20):
+        tund = ttk.Label(raam)
+        tund.place(x=800, y=100+n, width=200)
+        silt = ttk.Label(raam, text=str(i)+":00")
+        silt.place(x=760, y=100+n)
+        n+=20
+    nupp = ttk.Button(raam, text="Lisa üritus", command=salvesta)
+    nupp.place(x=760, y=370, width=100)
+
+"""Kuidas saada teada, millisele kuupäeva buttonile vajutati ning anda see info meetodi sisendiks?"""
+
+
+
+
+    
+
+# loome peaakna
+raam = Tk()
+raam.title("Kalender")
+raam.geometry("1200x600")
+
+# loome aasta tekstikasti jaoks sildi
+silt = ttk.Label(raam, text="Aasta")
+silt.place(x=5, y=5)
+
+# loome aasta sisestamiseks tekstikasti
+aasta = ttk.Entry(raam)
+aasta.place(x=70, y=5, width=150)
+aasta.insert(0, praegune_aasta)
+
+# loome kuu tekstikasti jaoks sildi
+silt = ttk.Label(raam, text="Kuu")
+silt.place(x=5, y=30)
+
+# loome kuu sisestamiseks tekstikasti
+kuu = ttk.Entry(raam)
+kuu.place(x=70, y=30, width=150)
+kuu.insert(0, praegune_kuu)
+
+# loome nupu kalendri näitamiseks
+nupp = ttk.Button(raam, text="Näita kalendrit", command=kuva)
+nupp.place(x=70, y=65, width=150)
+
+# loome nupu järgmisele kuule liikumiseks
+nupp = ttk.Button(raam, text=">", command=järgmine)
+nupp.place(x=725, y=240, width=20)
+
+# loome nupu eelmisele kuule liikumiseks
+nupp = ttk.Button(raam, text="<", command=eelmine)
+nupp.place(x=255, y=240, width=20)
+
+nädalapäevad = ["E", "T", "K", "N", "R", "L", "P"]
+nx = 290
+for i in nädalapäevad:
+    nupp = ttk.Label(raam, text='     '+i, font="Helvetica")
+    nupp.place(x=nx, y=70, width=60, height=60)
+    nx += 60
+
+
+todo_loendur = 0
+# loome To do listi sildi
+silt = ttk.Label(raam, text="To do:")
+silt.place(x=20, y=100, width=150)
+
+# loome sildi uue to do lisamiseks
+silt = ttk.Label(raam, text="Lisa ülesanne:")
+silt.place(x=20, y=420, width=100)
+
+# loome kuu sisestamiseks tekstikasti
+todo = ttk.Entry(raam)
+todo.place(x=20, y=440, width=150)
+
+eelmised_todo()
+# OK nupp todo salvestamiseks
+nupp = ttk.Button(raam, text="OK", command=uus_todo)
+nupp.place(x=180, y=440, width=30)
+
+# ilmutame akna ekraanile
+raam.mainloop()
